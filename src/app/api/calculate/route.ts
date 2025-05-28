@@ -20,7 +20,7 @@ Rispondi con: Aliquota, motivazione, e riferimento normativo.
     'Content-Type': 'application/json',
   },
     body: JSON.stringify({
-      model: 'openchat/openchat-3.5-0106',
+      model: 'mistralai/mistral-7b-instruct',
       messages: [
         { role: 'system', content: 'Sei un esperto di fiscalità immobiliare in Italia.' },
         { role: 'user', content: prompt },
