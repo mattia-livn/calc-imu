@@ -1,16 +1,18 @@
 import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
-  console.log("🧠 Chiamata ricevuta da /api/ai")
-
   const { visura } = await req.json()
-  console.log("📄 Visura ricevuta:", visura)
+
+  if (!visura) {
+    return NextResponse.json({ risposta: null, raw: 'Nessun testo fornito' }, { status: 400 })
+  }
 
   const prompt = `
 Calcola l'IMU per questa visura catastale:
 ${visura}
+
 Rispondi con: Aliquota, motivazione, e riferimento normativo.
-  `
+`
 
   const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
@@ -28,8 +30,8 @@ Rispondi con: Aliquota, motivazione, e riferimento normativo.
   })
 
   const json = await res.json()
-  console.log("📨 Risposta OpenRouter:", JSON.stringify(json, null, 2))
+  console.log('📨 Risposta OpenRouter:', JSON.stringify(json, null, 2))
 
-  const risposta = json.choices?.[0]?.message?.content
-  return NextResponse.json({ risposta: risposta || 'Non sono riuscito a calcolare l’IMU.' })
+  const risposta = json.choices?.[0]?.message?.content || null
+  return NextResponse.json({ risposta, raw: JSON.stringify(json) })
 }
