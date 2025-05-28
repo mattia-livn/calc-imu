@@ -3,10 +3,11 @@ import { NextResponse } from 'next/server'
 export async function POST(req: Request) {
   const { visura } = await req.json()
 
-  const prompt = 
+  const prompt = `
 Calcola l'IMU per questa visura catastale:
 ${visura}
 Rispondi con: Aliquota, motivazione, e riferimento normativo.
+`
 
 
   const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
