@@ -1,3 +1,5 @@
+console.log("📥 Upload endpoint hit")
+
 // src/app/api/upload/route.ts
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
