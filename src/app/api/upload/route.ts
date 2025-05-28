@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     const arrayBuffer = await file.arrayBuffer()
     const buffer = new Uint8Array(arrayBuffer)
 
-    const { data: uploadedFile, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from('uploads')
       .upload(`${file.name}`, buffer, {
         contentType: file.type,
@@ -31,8 +31,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    const { data: publicUrlData } = supabase.storage.from('uploads').getPublicUrl(`${file.name}`)
-    const publicUrl = publicUrlData?.publicUrl
+    const publicUrl = `https://kysddyoyiehkahfdfrhj.supabase.co/storage/v1/object/public/uploads/${file.name}`
 
     return NextResponse.json({ url: publicUrl })
   } catch (err: any) {
