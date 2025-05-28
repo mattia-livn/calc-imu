@@ -11,10 +11,13 @@ export default function FileUpload({ onUpload, disabled }: Props) {
   const [file, setFile] = useState<File | null>(null)
 
   const handleUpload = async () => {
+    console.log("📤 Bottone cliccato")
     if (!file) return
+    console.log("📄 File selezionato:", file.name)
     await onUpload(file)
     setFile(null)
   }
+
 
   return (
     <div className="flex items-center gap-2">
