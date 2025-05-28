@@ -1,44 +1,56 @@
 'use client'
 
-import { useRef } from 'react'
+import React, { useState } from 'react'
 
-type FileUploadProps = {
-  onUpload: (file: File) => void
-  disabled?: boolean
+interface FileUploadProps {
+  onUploadComplete: (fileUrl: string) => void
 }
 
-export default function FileUpload({ onUpload, disabled }: FileUploadProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null)
+export default function FileUpload({ onUploadComplete }: FileUploadProps) {
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
 
-  const handleClick = () => {
-    fileInputRef.current?.click()
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) {
-      console.log('📄 File selezionato:', file.name)
-      onUpload(file)
+    if (!file) return
+
+    setSelectedFileName(file.name)
+    setUploading(true)
+
+    const formData = new FormData()
+    formData.append('file', file)
+
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const data = await res.json()
+
+      if (res.ok && data.url) {
+        console.log('✅ File caricato con successo:', data.url)
+        onUploadComplete(data.url)
+      } else {
+        console.error('❌ Errore caricamento:', data.error || 'Errore sconosciuto')
+      }
+    } catch (err) {
+      console.error('❌ Errore di rete:', err)
+    } finally {
+      setUploading(false)
     }
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="space-y-2">
       <input
         type="file"
-        accept=".pdf"
+        accept="application/pdf"
         onChange={handleChange}
-        ref={fileInputRef}
-        className="hidden"
-        disabled={disabled}
+        disabled={uploading}
       />
-      <button
-        onClick={handleClick}
-        className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-md transition-colors disabled:opacity-50"
-        disabled={disabled}
-      >
-        📤 Carica visura catastale (PDF)
-      </button>
+      {uploading && <p>⏳ Caricamento in corso...</p>}
+      {selectedFileName && !uploading && <p>📄 File selezionato: {selectedFileName}</p>}
     </div>
   )
 }
