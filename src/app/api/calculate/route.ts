@@ -1,3 +1,6 @@
+const json = await res.json()
+console.log("📨 Risposta OpenRouter:", JSON.stringify(json, null, 2))
+
 import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
