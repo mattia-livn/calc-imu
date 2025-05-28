@@ -5,9 +5,10 @@ import { randomUUID } from 'crypto'
 import pdfParseCjs from 'pdf-parse/lib/pdf-parse.js'
 
 const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  'https://kysddyoyiehkahfdfrhj.supabase.co', // <-- metti qui manualmente la tua SUPABASE_URL
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5c2RkeW95aWVoa2FoZmRmcmhqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0ODAyMDg2NCwiZXhwIjoyMDYzNTk2ODY0fQ.UCJ1Y-WtE00Yz78VKXT84xCoftx5FOHDsMKJR9am3AE' // <-- metti qui manualmente la tua SERVICE_ROLE_KEY
 )
+
 
 export async function POST(req: Request) {
   try {
