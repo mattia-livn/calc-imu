@@ -27,35 +27,42 @@ export default function ChatFeed() {
     setMessages((prev) => [...prev, msg])
   }
 
-const handleFileUpload = async (file: File) => {
-  const formData = new FormData()
-  formData.append('file', file)
+  const handleFileUpload = async (file: File) => {
+    console.log('📤 Bottone cliccato')
+    const formData = new FormData()
+    formData.append('file', file)
 
-  const res = await fetch('/api/upload', {
-    method: 'POST',
-    body: formData,
-  })
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+    })
 
-  const { visura } = await res.json()
-  console.log('📄 Visura:', visura)
+    const { visura } = await res.json()
+    console.log('📄 Visura:', visura)
 
-  const aiRes = await fetch('/api/ai', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ visura }),
-  })
+    if (!visura) {
+      alert('⚠️ Errore: nessun testo trovato nel PDF.')
+      return
+    }
 
-  const data = await aiRes.json()
+    const aiRes = await fetch('/api/ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ visura }),
+    })
 
-  console.log('🤖 Risposta AI:', data.risposta)
-  console.log('🧪 RAW AI RESPONSE:', data.raw)
+    const data = await aiRes.json()
 
-  if (!data.risposta) {
-    alert('⚠️ L’AI non è riuscita a calcolare l’IMU. Controlla i log server.')
-  } else {
-    // qui potresti mostrarla a video o salvarla nello stato
+    console.log('🤖 Risposta AI:', data.risposta)
+    console.log('🧪 RAW AI RESPONSE:', data.raw)
+
+    if (!data.risposta) {
+      alert('⚠️ L’AI non è riuscita a calcolare l’IMU. Controlla i log server.')
+    } else {
+      addMessage({ role: 'user', content: '[PDF caricato]' })
+      addMessage({ role: 'ai', content: data.risposta })
+    }
   }
-}
 
   const sendMessage = async () => {
     if (!input.trim()) return
