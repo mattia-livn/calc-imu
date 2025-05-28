@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { randomUUID } from 'crypto'
-import pdfParse from 'pdf-parse'
+import * as pdfParse from 'pdf-parse'
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -23,7 +23,7 @@ export async function POST(req: Request) {
   // ✅ Estrazione testo
   let testoEstratto = ''
   try {
-    const parsed = await pdfParse(buffer)
+    const parsed = await pdfParse.default(buffer)
     testoEstratto = parsed.text
   } catch (err) {
     return NextResponse.json({ error: 'Errore nella lettura del PDF' }, { status: 500 })
