@@ -1,39 +1,43 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef } from 'react'
 
-type Props = {
-  onUpload: (file: File) => Promise<void>
+type FileUploadProps = {
+  onUpload: (file: File) => void
   disabled?: boolean
 }
 
-export default function FileUpload({ onUpload, disabled }: Props) {
-  const [file, setFile] = useState<File | null>(null)
+export default function FileUpload({ onUpload, disabled }: FileUploadProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleUpload = async () => {
-    console.log("📤 Bottone cliccato")
-    if (!file) return
-    console.log("📄 File selezionato:", file.name)
-    await onUpload(file)
-    setFile(null)
+  const handleClick = () => {
+    fileInputRef.current?.click()
   }
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      console.log('📄 File selezionato:', file.name)
+      onUpload(file)
+    }
+  }
 
   return (
     <div className="flex items-center gap-2">
       <input
         type="file"
-        accept="application/pdf"
-        onChange={(e) => setFile(e.target.files?.[0] || null)}
-        className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-gray-100 hover:file:bg-gray-200 file:cursor-pointer"
+        accept=".pdf"
+        onChange={handleChange}
+        ref={fileInputRef}
+        className="hidden"
         disabled={disabled}
       />
       <button
-        onClick={handleUpload}
-        disabled={!file || disabled}
-        className="text-sm bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:hover:bg-gray-100"
+        onClick={handleClick}
+        className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-md transition-colors disabled:opacity-50"
+        disabled={disabled}
       >
-        {disabled ? 'Caricamento...' : 'Carica PDF'}
+        📤 Carica visura catastale (PDF)
       </button>
     </div>
   )
