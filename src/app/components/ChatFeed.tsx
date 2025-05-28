@@ -27,49 +27,35 @@ export default function ChatFeed() {
     setMessages((prev) => [...prev, msg])
   }
 
- const handleFileUpload = async (file: File) => {
-  setIsLoading(true)
-  addMessage({ role: 'ai', content: 'Analisi in corso...' })
-
+const handleFileUpload = async (file: File) => {
   const formData = new FormData()
   formData.append('file', file)
 
-  try {
-    const res = await fetch('/api/upload', {
-      method: 'POST',
-      body: formData,
-    })
+  const res = await fetch('/api/upload', {
+    method: 'POST',
+    body: formData,
+  })
 
-    const text = await res.text()
-    console.log('📦 Risposta grezza upload:', text)
+  const { visura } = await res.json()
+  console.log('📄 Visura:', visura)
 
-    let data = {}
-    try {
-      data = JSON.parse(text)
-    } catch (e) {
-      console.error('❌ Errore nel parsing JSON:', e)
-    }
+  const aiRes = await fetch('/api/ai', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ visura }),
+  })
 
-    // Remove loading message
-    setMessages(prev => prev.slice(0, -1))
+  const data = await aiRes.json()
 
-    if ('testoEstratto' in data) {
-      addMessage({ role: 'user', content: (data as any).testoEstratto })
-    }
-    if ('risposta' in data) {
-      addMessage({ role: 'ai', content: (data as any).risposta })
-    } else {
-      addMessage({ role: 'ai', content: 'Errore nel calcolo. (No risposta)' })
-    }
-  } catch (error) {
-    console.error('❌ Errore nel fetch upload:', error)
-    setMessages(prev => prev.slice(0, -1))
-    addMessage({ role: 'ai', content: 'Errore durante l\'analisi del file (fetch).' })
-  } finally {
-    setIsLoading(false)
+  console.log('🤖 Risposta AI:', data.risposta)
+  console.log('🧪 RAW AI RESPONSE:', data.raw)
+
+  if (!data.risposta) {
+    alert('⚠️ L’AI non è riuscita a calcolare l’IMU. Controlla i log server.')
+  } else {
+    // qui potresti mostrarla a video o salvarla nello stato
   }
 }
-
 
   const sendMessage = async () => {
     if (!input.trim()) return
