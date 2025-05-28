@@ -76,6 +76,15 @@ export default function ChatFeed() {
     setMessages([...newMessages, { role: 'ai', content: data.risposta || 'Errore nel calcolo.' }])
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      if (!isLoading && input.trim()) {
+        sendMessage()
+      }
+    }
+  }
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -93,6 +102,7 @@ export default function ChatFeed() {
             className="flex-1 border p-3 rounded-lg font-sans focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="Scrivi qui la tua situazione..."
             disabled={isLoading}
           />
