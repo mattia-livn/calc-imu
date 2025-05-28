@@ -27,38 +27,49 @@ export default function ChatFeed() {
     setMessages((prev) => [...prev, msg])
   }
 
-  const handleFileUpload = async (file: File) => {
-    setIsLoading(true)
-    addMessage({ role: 'ai', content: 'Analisi in corso...' })
+ const handleFileUpload = async (file: File) => {
+  setIsLoading(true)
+  addMessage({ role: 'ai', content: 'Analisi in corso...' })
 
-    const formData = new FormData()
-    formData.append('file', file)
+  const formData = new FormData()
+  formData.append('file', file)
 
+  try {
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+    })
+
+    const text = await res.text()
+    console.log('📦 Risposta grezza upload:', text)
+
+    let data = {}
     try {
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      })
-
-      const data = await res.json()
-      
-      // Remove loading message
-      setMessages(prev => prev.slice(0, -1))
-
-      if (data.testoEstratto) {
-        addMessage({ role: 'user', content: data.testoEstratto })
-      }
-      if (data.risposta) {
-        addMessage({ role: 'ai', content: data.risposta })
-      }
-    } catch (error) {
-      // Remove loading message
-      setMessages(prev => prev.slice(0, -1))
-      addMessage({ role: 'ai', content: 'Si è verificato un errore durante l\'analisi del file.' })
-    } finally {
-      setIsLoading(false)
+      data = JSON.parse(text)
+    } catch (e) {
+      console.error('❌ Errore nel parsing JSON:', e)
     }
+
+    // Remove loading message
+    setMessages(prev => prev.slice(0, -1))
+
+    if ('testoEstratto' in data) {
+      addMessage({ role: 'user', content: (data as any).testoEstratto })
+    }
+    if ('risposta' in data) {
+      addMessage({ role: 'ai', content: (data as any).risposta })
+    } else {
+      addMessage({ role: 'ai', content: 'Errore nel calcolo. (No risposta)' })
+    }
+  } catch (error) {
+    console.error('❌ Errore nel fetch upload:', error)
+    setMessages(prev => prev.slice(0, -1))
+    addMessage({ role: 'ai', content: 'Errore durante l\'analisi del file (fetch).' })
+  } finally {
+    setIsLoading(false)
   }
+}
+
 
   const sendMessage = async () => {
     if (!input.trim()) return
