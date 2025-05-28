@@ -1,10 +1,14 @@
-import ChatFeed from './imu/components/ChatFeed'
+import ChatFeed from './components/ChatFeed'
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white text-black px-6 py-12 max-w-2xl mx-auto">
-      <h1 className="text-3xl font-serif mb-8">Calcolo IMU – Livn</h1>
-      <ChatFeed />
-    </main>
+    <div className="flex flex-col h-screen bg-white">
+      <header className="border-b p-4">
+        <h1 className="text-xl font-semibold text-center">Calcolo IMU – Livn</h1>
+      </header>
+      <main className="flex-1 overflow-hidden">
+        <ChatFeed />
+      </main>
+    </div>
   )
 }
