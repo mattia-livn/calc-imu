@@ -1,4 +1,4 @@
-declare module 'pdf-parse' {
+declare module 'pdf-parse/lib/pdf-parse.js' {
   interface PDFParseData {
     numpages: number
     numrender: number
@@ -8,5 +8,6 @@ declare module 'pdf-parse' {
     text: string
   }
 
-  export default function pdf(dataBuffer: Buffer): Promise<PDFParseData>
+  const pdfParse: (dataBuffer: Buffer) => Promise<PDFParseData>
+  export default pdfParse
 }
