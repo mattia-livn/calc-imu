@@ -1,4 +1,3 @@
-// src/app/imu/components/ChatFeed.tsx
 'use client'
 
 import { useState } from 'react'
@@ -20,7 +19,8 @@ export default function ChatFeed() {
 
   const sendMessage = async () => {
     if (!input.trim()) return
-    const newMessages = [...messages, { role: 'user', content: input }]
+
+    const newMessages: MessageType[] = [...messages, { role: 'user', content: input }]
     setMessages(newMessages)
     setInput('')
 
@@ -28,6 +28,7 @@ export default function ChatFeed() {
       method: 'POST',
       body: JSON.stringify({ visura: input }),
     })
+
     const data = await res.json()
     setMessages([...newMessages, { role: 'ai', content: data.risposta || 'Errore nel calcolo.' }])
   }
