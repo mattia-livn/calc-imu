@@ -3,41 +3,17 @@
 import { useState } from 'react'
 
 type Props = {
-  addMessage: (msg: { role: 'user' | 'ai'; content: string }) => void
+  onUpload: (file: File) => Promise<void>
+  disabled?: boolean
 }
 
-export default function FileUpload({ addMessage }: Props) {
+export default function FileUpload({ onUpload, disabled }: Props) {
   const [file, setFile] = useState<File | null>(null)
-  const [uploading, setUploading] = useState(false)
 
-  const uploadFile = async () => {
+  const handleUpload = async () => {
     if (!file) return
-    setUploading(true)
-
-    const formData = new FormData()
-    formData.append('file', file)
-
-    try {
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      })
-
-      const json = await res.json()
-      if (res.ok && json.risposta) {
-        if (json.testoEstratto) {
-          addMessage({ role: 'user', content: json.testoEstratto })
-        }
-        addMessage({ role: 'ai', content: json.risposta })
-      } else {
-        addMessage({ role: 'ai', content: json.error || 'Errore sconosciuto nella risposta AI.' })
-      }
-    } catch (err) {
-      console.error(err)
-      addMessage({ role: 'ai', content: 'Errore di rete durante il caricamento.' })
-    } finally {
-      setUploading(false)
-    }
+    await onUpload(file)
+    setFile(null)
   }
 
   return (
@@ -47,13 +23,14 @@ export default function FileUpload({ addMessage }: Props) {
         accept="application/pdf"
         onChange={(e) => setFile(e.target.files?.[0] || null)}
         className="text-sm"
+        disabled={disabled}
       />
       <button
-        onClick={uploadFile}
-        disabled={!file || uploading}
+        onClick={handleUpload}
+        disabled={!file || disabled}
         className="ml-2 text-sm bg-blue-600 text-white px-3 py-1 rounded disabled:opacity-50"
       >
-        {uploading ? 'Caricamento...' : 'Carica PDF'}
+        {disabled ? 'Caricamento...' : 'Carica PDF'}
       </button>
     </div>
   )
